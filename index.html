@@ -542,10 +542,13 @@
             document.getElementById('feedback').textContent = '♪ 音を再生中...';
             document.getElementById('feedback').className = 'feedback waiting';
 
-            const randomNote = noteNames[Math.floor(Math.random() * noteNames.length)];
-            gameState.currentNote = randomNote;
+            // 新しい音がまだ選ばれていない場合のみ選ぶ
+            // 正解・不正解になるまで同じ音が流れ続ける
+            if (!gameState.currentNote) {
+                gameState.currentNote = noteNames[Math.floor(Math.random() * noteNames.length)];
+            }
 
-            playPianoSound(notes[randomNote].freq, 1.5);
+            playPianoSound(notes[gameState.currentNote].freq, 1.5);
         }
 
         // ピアノ音を再生（ゲームプレイ用）
@@ -731,6 +734,8 @@
                     btn.disabled = false;
                     btn.classList.remove('correct', 'incorrect');
                 });
+                // 次の問題用に音をリセット
+                gameState.currentNote = null;
                 playRandomNote();
             }, 2000);
         }
