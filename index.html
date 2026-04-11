@@ -3,756 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
     <title>🎹 ドレミ音当てゲーム</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', 'MS Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
-            text-align: center;
-        }
-
-        .header h2 {
-            color: white;
-            font-size: 14px;
-            font-weight: normal;
-            letter-spacing: 2px;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px 20px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            margin-top: 80px;
-        }
-
-        h1 {
-            font-size: 36px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .piano-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .illustration-section {
-            margin: 20px 0 30px 0;
-            text-align: center;
-        }
-
-        .illustration-image {
-            max-width: 100%;
-            max-height: 250px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            object-fit: contain;
-        }
-
-        .header-image {
-            max-width: 100%;
-            object-fit: contain;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .score-section {
-            background: linear-gradient(135deg, #f0f4ff 0%, #e8eef9 100%);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border: 2px solid #667eea;
-        }
-
-        .score-item {
-            text-align: center;
-        }
-
-        .score-label {
-            font-size: 14px;
-            color: #666;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .score-value {
-            font-size: 36px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .game-section {
-            margin-bottom: 40px;
-        }
-
-        .play-button {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8c42 100%);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 18px 50px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        .play-button:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
-        }
-
-        .play-button:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .play-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .feedback {
-            min-height: 50px;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feedback.correct-feedback {
-            color: #4caf50;
-            animation: correctBounce 0.6s ease;
-        }
-
-        .feedback.incorrect-feedback {
-            color: #f44336;
-            animation: incorrectShake 0.5s ease;
-        }
-
-        .feedback.waiting {
-            color: #999;
-        }
-
-        @keyframes correctBounce {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes incorrectShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .piano-keys {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .key-button {
-            aspect-ratio: 1;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .key-button:hover:not(:disabled) {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .key-button:active:not(:disabled) {
-            transform: translateY(-2px);
-        }
-
-        .key-button.do {
-            background: linear-gradient(135deg, #ff6b6b, #ff5252);
-        }
-
-        .key-button.re {
-            background: linear-gradient(135deg, #ff8c42, #ff7043);
-        }
-
-        .key-button.mi {
-            background: linear-gradient(135deg, #ffd93d, #ffb74d);
-        }
-
-        .key-button.fa {
-            background: linear-gradient(135deg, #6bcf7f, #4caf50);
-        }
-
-        .key-button.so {
-            background: linear-gradient(135deg, #4ecdc4, #26c6da);
-        }
-
-        .key-button.ra {
-            background: linear-gradient(135deg, #667eea, #5c6bc0);
-        }
-
-        .key-button.si {
-            background: linear-gradient(135deg, #d946ef, #c2185b);
-        }
-
-        .key-button.correct {
-            animation: correctPulse 0.6s ease;
-        }
-
-        .key-button.incorrect {
-            animation: incorrectShake 0.5s ease;
-        }
-
-        @keyframes correctPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        .key-name {
-            font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .key-stats {
-            font-size: 10px;
-            margin-top: 2px;
-            opacity: 0.9;
-            font-weight: normal;
-        }
-
-        .stats-section {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 2px solid #ffb74d;
-        }
-
-        .stats-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #f57c00;
-            margin-bottom: 15px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
-        }
-
-        .stat-item {
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
-            border: 2px solid #ffb74d;
-        }
-
-        .stat-note {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .stat-correct {
-            color: #4caf50;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .stat-incorrect {
-            color: #f44336;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .stat-rate {
-            font-size: 11px;
-            color: #666;
-            margin-top: 3px;
-        }
-
-        .decoration {
-            position: fixed;
-            pointer-events: none;
-            opacity: 0.1;
-        }
-
-        .decoration-left {
-            left: 10px;
-            top: 20%;
-            font-size: 150px;
-        }
-
-        .decoration-right {
-            right: 10px;
-            bottom: 20%;
-            font-size: 150px;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 15px;
-                margin-top: 100px;
-            }
-
-            h1 {
-                font-size: 28px;
-            }
-
-            .subtitle {
-                font-size: 16px;
-            }
-
-            .play-button {
-                padding: 16px 40px;
-                font-size: 18px;
-            }
-
-            .score-section {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .piano-keys {
-                gap: 6px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(7, 1fr);
-                gap: 8px;
-            }
-
-            .decoration-left, .decoration-right {
-                display: none;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', 'MS Gothic', sans-serif; background: #e8e4d0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .header { position: absolute; top: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.5); padding: 15px 0; text-align: center; }
+        .header img { max-height: 80px; object-fit: contain; }
+        .container { background: white; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 40px 20px; max-width: 500px; width: 100%; text-align: center; margin-top: 120px; }
+        h1 { font-size: 36px; color: #333; margin-bottom: 10px; }
+        .subtitle { font-size: 18px; color: #666; margin-bottom: 30px; }
+        .piano-icon { font-size: 60px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .score-section { background: rgba(255,255,255,0.7); border-radius: 15px; padding: 20px; margin-bottom: 30px; display: flex; justify-content: space-around; align-items: center; border: 2px solid #9c7e6f; }
+        .score-item { text-align: center; }
+        .score-label { font-size: 14px; color: #666; font-weight: bold; margin-bottom: 5px; }
+        .score-value { font-size: 36px; font-weight: bold; color: #9c7e6f; }
+        .game-section { margin-bottom: 40px; }
+        .play-button { background: linear-gradient(135deg, #9c7e6f 0%, #8b6f47 100%); color: white; border: none; border-radius: 20px; padding: 18px 50px; font-size: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(156,126,111,0.3); }
+        .play-button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(156,126,111,0.5); }
+        .play-button:active:not(:disabled) { transform: translateY(0); }
+        .play-button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .feedback { min-height: 50px; font-size: 24px; font-weight: bold; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; }
+        .feedback.correct-feedback { color: #4caf50; animation: correctBounce 0.6s ease; }
+        .feedback.incorrect-feedback { color: #f44336; animation: incorrectShake 0.5s ease; }
+        .feedback.waiting { color: #999; }
+        @keyframes correctBounce { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes incorrectShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .piano-keys { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+        .key-button { aspect-ratio: 1; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .key-button:hover:not(:disabled) { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .key-button.do { background: linear-gradient(135deg, #ff6b6b, #ff5252); }
+        .key-button.re { background: linear-gradient(135deg, #ff8c42, #ff7043); }
+        .key-button.mi { background: linear-gradient(135deg, #ffd93d, #ffb74d); }
+        .key-button.fa { background: linear-gradient(135deg, #6bcf7f, #4caf50); }
+        .key-button.so { background: linear-gradient(135deg, #4ecdc4, #26c6da); }
+        .key-button.ra { background: linear-gradient(135deg, #667eea, #5c6bc0); }
+        .key-button.si { background: linear-gradient(135deg, #d946ef, #c2185b); }
+        .key-button.correct { animation: correctPulse 0.6s ease; }
+        @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .key-name { font-size: 12px; margin-top: 3px; }
+        .key-stats { font-size: 10px; margin-top: 2px; opacity: 0.9; font-weight: normal; }
+        .stats-section { background: rgba(255,255,255,0.6); border-radius: 15px; padding: 20px; margin-top: 30px; border: 2px solid #9c7e6f; }
+        .stats-title { font-size: 16px; font-weight: bold; color: #8b6f47; margin-bottom: 15px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .stat-item { background: white; border-radius: 10px; padding: 10px; border: 2px solid #9c7e6f; }
+        .stat-note { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .stat-correct { color: #4caf50; font-size: 12px; font-weight: bold; }
+        .stat-incorrect { color: #f44336; font-size: 12px; font-weight: bold; }
+        .stat-rate { font-size: 11px; color: #666; margin-top: 3px; }
+        @media (max-width: 480px) { .container { margin-top: 130px; } h1 { font-size: 28px; } .play-button { padding: 16px 40px; font-size: 18px; } .score-section { flex-direction: column; gap: 15px; } }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="images/title.png" alt="ピアノ&リトミック教室" class="header-image" style="max-height: 60px; margin-bottom: 10px;">
-        <h2>🎹 ピアノ&リトミック教室</h2>
-        <p>音感トレーニング</p>
+        <img src="images/title.png" alt="ピアノ&リトミック教室">
     </div>
-
-    <div class="decoration decoration-left">🎵</div>
-    <div class="decoration decoration-right">🎶</div>
-
     <div class="container">
         <div class="piano-icon">🎹</div>
         <h1>ドレミ音当てゲーム</h1>
         <p class="subtitle">聞こえた音を当ててね！</p>
-
-        <div class="illustration-section">
-            <img src="images/illustration.png" alt="ピアノ教室のイラスト" class="illustration-image">
-        </div>
-
         <div class="score-section">
-            <div class="score-item">
-                <div class="score-label">正解 ✨</div>
-                <div class="score-value" id="correctCount">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">不正解 ❌</div>
-                <div class="score-value" id="incorrectCount">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">正答率 📊</div>
-                <div class="score-value" id="accuracy">-</div>
-            </div>
+            <div class="score-item"><div class="score-label">正解 ✨</div><div class="score-value" id="correctCount">0</div></div>
+            <div class="score-item"><div class="score-label">不正解 ❌</div><div class="score-value" id="incorrectCount">0</div></div>
+            <div class="score-item"><div class="score-label">正答率 📊</div><div class="score-value" id="accuracy">-</div></div>
         </div>
-
         <div class="game-section">
             <button class="play-button" id="playButton">♪ 音を聞く ♪</button>
             <div class="feedback waiting" id="feedback">準備完了！音を聞いてね</div>
         </div>
-
         <div class="piano-keys" id="pianoKeys"></div>
-
         <div class="stats-section">
             <div class="stats-title">🎵 各音の成績</div>
             <div class="stats-grid" id="statsGrid"></div>
         </div>
     </div>
-
     <script>
-        // Web Audio API セットアップ
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        // ゲーム状態
-        let gameState = {
-            currentNote: null,
-            correctCount: 0,
-            incorrectCount: 0,
-            isPlaying: false,
-            isWaiting: false,
-            noteStats: {}
-        };
-
-        // ドレミファソラシドの周波数
-        const notes = {
-            'ド': { freq: 261.63, class: 'do', index: 0 },
-            'レ': { freq: 293.66, class: 're', index: 1 },
-            'ミ': { freq: 329.63, class: 'mi', index: 2 },
-            'ファ': { freq: 349.23, class: 'fa', index: 3 },
-            'ソ': { freq: 392.00, class: 'so', index: 4 },
-            'ラ': { freq: 440.00, class: 'ra', index: 5 },
-            'シ': { freq: 493.88, class: 'si', index: 6 }
-        };
-
+        let gameState = { currentNote: null, correctCount: 0, incorrectCount: 0, isPlaying: false, isWaiting: false, noteStats: {} };
+        const notes = { 'ド': { freq: 261.63, class: 'do' }, 'レ': { freq: 293.66, class: 're' }, 'ミ': { freq: 329.63, class: 'mi' }, 'ファ': { freq: 349.23, class: 'fa' }, 'ソ': { freq: 392.00, class: 'so' }, 'ラ': { freq: 440.00, class: 'ra' }, 'シ': { freq: 493.88, class: 'si' } };
         const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ'];
-
-        // 初期化
         function init() {
-            // 統計の初期化
-            noteNames.forEach(name => {
-                gameState.noteStats[name] = { correct: 0, incorrect: 0 };
-            });
-
-            createPianoKeys();
-            updateStatsDisplay();
-            setupEventListeners();
+            noteNames.forEach(name => { gameState.noteStats[name] = { correct: 0, incorrect: 0 }; });
+            createPianoKeys(); updateStatsDisplay(); setupEventListeners();
         }
-
-        // ピアノキーの作成
         function createPianoKeys() {
             const container = document.getElementById('pianoKeys');
             container.innerHTML = '';
-
             noteNames.forEach(name => {
                 const noteInfo = notes[name];
                 const button = document.createElement('button');
                 button.className = `key-button ${noteInfo.class}`;
-                button.innerHTML = `<span>${name}</span><span class="key-name"></span><span class="key-stats" id="stats-${name}"></span>`;
+                button.innerHTML = `<span>${name}</span><span class="key-stats" id="stats-${name}"></span>`;
                 button.dataset.note = name;
                 button.addEventListener('click', () => guessNote(name));
                 container.appendChild(button);
             });
-
             updateKeyStats();
         }
-
-        // キーボタンの統計を更新
         function updateKeyStats() {
             noteNames.forEach(name => {
                 const stats = gameState.noteStats[name];
                 const statEl = document.getElementById(`stats-${name}`);
-                if (stats.correct + stats.incorrect > 0) {
-                    statEl.textContent = `✓${stats.correct} ✗${stats.incorrect}`;
-                } else {
-                    statEl.textContent = '';
-                }
+                if (stats.correct + stats.incorrect > 0) statEl.textContent = `✓${stats.correct} ✗${stats.incorrect}`;
             });
         }
-
-        // 成績表示を更新
         function updateStatsDisplay() {
             const grid = document.getElementById('statsGrid');
             grid.innerHTML = '';
-
             noteNames.forEach(name => {
                 const stats = gameState.noteStats[name];
                 const total = stats.correct + stats.incorrect;
                 const rate = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
-
                 const item = document.createElement('div');
                 item.className = 'stat-item';
-                item.innerHTML = `
-                    <div class="stat-note">${name}</div>
-                    <div class="stat-correct">✓ ${stats.correct}</div>
-                    <div class="stat-incorrect">✗ ${stats.incorrect}</div>
-                    <div class="stat-rate">${rate}%</div>
-                `;
+                item.innerHTML = `<div class="stat-note">${name}</div><div class="stat-correct">✓ ${stats.correct}</div><div class="stat-incorrect">✗ ${stats.incorrect}</div><div class="stat-rate">${rate}%</div>`;
                 grid.appendChild(item);
             });
         }
-
-        // イベントリスナー設定
         function setupEventListeners() {
             document.getElementById('playButton').addEventListener('click', playRandomNote);
         }
-
-        // ランダムな音を再生
         function playRandomNote() {
             if (gameState.isPlaying) return;
-
-            gameState.isPlaying = true;
-            gameState.isWaiting = true;
+            gameState.isPlaying = true; gameState.isWaiting = true;
             document.getElementById('playButton').disabled = true;
             document.getElementById('feedback').textContent = '♪ 音を再生中...';
             document.getElementById('feedback').className = 'feedback waiting';
-
-            // 新しい音がまだ選ばれていない場合のみ選ぶ
-            // 正解・不正解になるまで同じ音が流れ続ける
-            if (!gameState.currentNote) {
-                gameState.currentNote = noteNames[Math.floor(Math.random() * noteNames.length)];
-            }
-
+            if (!gameState.currentNote) gameState.currentNote = noteNames[Math.floor(Math.random() * noteNames.length)];
             playPianoSound(notes[gameState.currentNote].freq, 1.5);
         }
-
-        // ピアノ音を再生（ゲームプレイ用）
         function playPianoSound(frequency, duration = 1.5) {
             try {
                 const now = audioContext.currentTime;
-
-                // ピアノらしい音を作るために複数の周波数成分を組み合わせる
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
-
-                // 基本波 + 倍音でピアノらしい音を作る
-                const harmonics = [
-                    { ratio: 1, volume: 0.4 },
-                    { ratio: 2, volume: 0.2 },
-                    { ratio: 3, volume: 0.1 },
-                    { ratio: 4, volume: 0.08 }
-                ];
-
+                const harmonics = [{ ratio: 1, volume: 0.4 }, { ratio: 2, volume: 0.2 }, { ratio: 3, volume: 0.1 }, { ratio: 4, volume: 0.08 }];
                 harmonics.forEach(harmonic => {
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
-
-                    osc.connect(gain);
-                    gain.connect(gainNode);
-
+                    osc.connect(gain); gain.connect(gainNode);
                     osc.frequency.value = frequency * harmonic.ratio;
                     osc.type = 'sine';
-
-                    // ピアノのようなエンベロープ（減衰）
                     gain.gain.setValueAtTime(0, now);
-                    // アタック（立ち上がり）
                     gain.gain.linearRampToValueAtTime(harmonic.volume, now + 0.05);
-                    // ディケイ（減衰）
                     gain.gain.exponentialRampToValueAtTime(0.1, now + duration * 0.3);
-                    // リリース（リリース）
                     gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-                    osc.start(now);
-                    osc.stop(now + duration);
+                    osc.start(now); osc.stop(now + duration);
                 });
-
-                // マスターゲインの設定
                 gainNode.gain.setValueAtTime(0.3, now);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-                // 再生完了後の処理
                 setTimeout(() => {
                     gameState.isPlaying = false;
                     document.getElementById('playButton').disabled = false;
-                    if (!gameState.isWaiting) {
-                        document.getElementById('feedback').textContent = '当ててみてね！';
-                        document.getElementById('feedback').className = 'feedback waiting';
-                    }
                 }, duration * 1000);
             } catch (e) {
-                console.error('Audio playback error:', e);
                 gameState.isPlaying = false;
                 document.getElementById('playButton').disabled = false;
             }
         }
-
-        // 正解音（高い輝く音）
         function playSuccessSound() {
             try {
                 const now = audioContext.currentTime;
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
-
-                // 高い周波数でキラキラした音
-                const frequencies = [880, 1100, 1320]; // 高い周波数
-                const duration = 0.6;
-
-                frequencies.forEach((freq, index) => {
+                [880, 1100, 1320].forEach((freq, index) => {
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
-
-                    osc.connect(gain);
-                    gain.connect(gainNode);
-
+                    osc.connect(gain); gain.connect(gainNode);
                     osc.frequency.value = freq;
                     osc.type = 'sine';
-
-                    // 明るい立ち上がり
                     gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
                     osc.start(now + index * 0.1);
-                    osc.stop(now + duration + index * 0.1);
+                    osc.stop(now + 0.6 + index * 0.1);
                 });
-
                 gainNode.gain.setValueAtTime(0.4, now);
-            } catch (e) {
-                console.error('Success sound error:', e);
-            }
+            } catch (e) {}
         }
-
-        // 不正解音（低い音）
         function playFailureSound() {
             try {
                 const now = audioContext.currentTime;
                 const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
-
-                // 低い周波数でブザー的な音
-                const frequencies = [200, 150]; // 低い周波数
-                const duration = 0.4;
-
-                frequencies.forEach((freq, index) => {
+                [200, 150].forEach(freq => {
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
-
-                    osc.connect(gain);
-                    gain.connect(gainNode);
-
+                    osc.connect(gain); gain.connect(gainNode);
                     osc.frequency.value = freq;
                     osc.type = 'sine';
-
-                    // 急速な減衰
                     gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-                    osc.start(now);
-                    osc.stop(now + duration);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
                 });
-
                 gainNode.gain.setValueAtTime(0.3, now);
-            } catch (e) {
-                console.error('Failure sound error:', e);
-            }
+            } catch (e) {}
         }
-
-        // 音を当てる
         function guessNote(guessedNote) {
             if (gameState.isPlaying || !gameState.currentNote) return;
-
             gameState.isWaiting = false;
             const feedback = document.getElementById('feedback');
             const buttons = document.querySelectorAll('.key-button');
-
-            // すべてのボタンを無効化
             buttons.forEach(btn => btn.disabled = true);
-
             if (guessedNote === gameState.currentNote) {
-                // 正解
                 gameState.correctCount++;
                 gameState.noteStats[gameState.currentNote].correct++;
-
-                buttons.forEach(btn => {
-                    if (btn.dataset.note === gameState.currentNote) {
-                        btn.classList.add('correct');
-                    }
-                });
+                buttons.forEach(btn => { if (btn.dataset.note === gameState.currentNote) btn.classList.add('correct'); });
                 feedback.textContent = '✨ せいかい！';
                 feedback.className = 'feedback correct-feedback';
                 playSuccessSound();
             } else {
-                // 不正解
                 gameState.incorrectCount++;
                 gameState.noteStats[gameState.currentNote].incorrect++;
-
                 buttons.forEach(btn => {
-                    if (btn.dataset.note === gameState.currentNote) {
-                        btn.classList.add('correct');
-                    } else if (btn.dataset.note === guessedNote) {
-                        btn.classList.add('incorrect');
-                    }
+                    if (btn.dataset.note === gameState.currentNote) btn.classList.add('correct');
+                    else if (btn.dataset.note === guessedNote) btn.classList.add('incorrect');
                 });
                 feedback.textContent = `❌ ざんねん。正解は「${gameState.currentNote}」でした`;
                 feedback.className = 'feedback incorrect-feedback';
                 playFailureSound();
             }
-
-            updateScore();
-            updateKeyStats();
-            updateStatsDisplay();
-
-            // 2秒後に次の問題へ
+            updateScore(); updateKeyStats(); updateStatsDisplay();
             setTimeout(() => {
-                buttons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.classList.remove('correct', 'incorrect');
-                });
-                // 次の問題用に音をリセット
+                buttons.forEach(btn => { btn.disabled = false; btn.classList.remove('correct', 'incorrect'); });
                 gameState.currentNote = null;
                 playRandomNote();
             }, 2000);
         }
-
-        // スコア更新
         function updateScore() {
             document.getElementById('correctCount').textContent = gameState.correctCount;
             document.getElementById('incorrectCount').textContent = gameState.incorrectCount;
-
             const total = gameState.correctCount + gameState.incorrectCount;
             if (total > 0) {
                 const accuracy = Math.round((gameState.correctCount / total) * 100);
                 document.getElementById('accuracy').textContent = accuracy + '%';
             }
         }
-
-        // ゲーム開始
         init();
     </script>
 </body>
