@@ -12,13 +12,36 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', 'MS Gothic', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 10px;
+        }
+
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .header h2 {
+            color: white;
+            font-size: 14px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            margin-top: 3px;
         }
 
         .container {
@@ -29,6 +52,7 @@
             max-width: 500px;
             width: 100%;
             text-align: center;
+            margin-top: 80px;
         }
 
         h1 {
@@ -43,14 +67,26 @@
             margin-bottom: 30px;
         }
 
+        .piano-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         .score-section {
-            background: #f0f4ff;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8eef9 100%);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-around;
             align-items: center;
+            border: 2px solid #667eea;
         }
 
         .score-item {
@@ -225,7 +261,7 @@
         }
 
         .stats-section {
-            background: #fff3e0;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
             border-radius: 15px;
             padding: 20px;
             margin-top: 30px;
@@ -277,9 +313,28 @@
             margin-top: 3px;
         }
 
+        .decoration {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .decoration-left {
+            left: 10px;
+            top: 20%;
+            font-size: 150px;
+        }
+
+        .decoration-right {
+            right: 10px;
+            bottom: 20%;
+            font-size: 150px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 30px 15px;
+                margin-top: 100px;
             }
 
             h1 {
@@ -308,12 +363,25 @@
                 grid-template-columns: repeat(7, 1fr);
                 gap: 8px;
             }
+
+            .decoration-left, .decoration-right {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h2>🎹 ピアノ&リトミック教室</h2>
+        <p>音感トレーニング</p>
+    </div>
+
+    <div class="decoration decoration-left">🎵</div>
+    <div class="decoration decoration-right">🎶</div>
+
     <div class="container">
-        <h1>🎹 ドレミ音当てゲーム</h1>
+        <div class="piano-icon">🎹</div>
+        <h1>ドレミ音当てゲーム</h1>
         <p class="subtitle">聞こえた音を当ててね！</p>
 
         <div class="score-section">
@@ -457,7 +525,7 @@
             playPianoSound(notes[randomNote].freq, 1.5);
         }
 
-        // ピアノ音を再生
+        // ピアノ音を再生（ゲームプレイ用）
         function playPianoSound(frequency, duration = 1.5) {
             try {
                 const now = audioContext.currentTime;
