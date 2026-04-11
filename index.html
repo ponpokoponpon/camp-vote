@@ -217,6 +217,66 @@
             margin-top: 3px;
         }
 
+        .key-stats {
+            font-size: 10px;
+            margin-top: 2px;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .stats-section {
+            background: #fff3e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid #ffb74d;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .stat-item {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            border: 2px solid #ffb74d;
+        }
+
+        .stat-note {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-correct {
+            color: #4caf50;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .stat-incorrect {
+            color: #f44336;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .stat-rate {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 30px 15px;
@@ -243,6 +303,11 @@
             .piano-keys {
                 gap: 6px;
             }
+
+            .stats-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -260,6 +325,10 @@
                 <div class="score-label">不正解 ❌</div>
                 <div class="score-value" id="incorrectCount">0</div>
             </div>
+            <div class="score-item">
+                <div class="score-label">正答率 📊</div>
+                <div class="score-value" id="accuracy">-</div>
+            </div>
         </div>
 
         <div class="game-section">
@@ -268,6 +337,11 @@
         </div>
 
         <div class="piano-keys" id="pianoKeys"></div>
+
+        <div class="stats-section">
+            <div class="stats-title">🎵 各音の成績</div>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
     </div>
 
     <script>
@@ -280,7 +354,8 @@
             correctCount: 0,
             incorrectCount: 0,
             isPlaying: false,
-            isWaiting: false
+            isWaiting: false,
+            noteStats: {}
         };
 
         // ドレミファソラシドの周波数
@@ -298,7 +373,13 @@
 
         // 初期化
         function init() {
+            // 統計の初期化
+            noteNames.forEach(name => {
+                gameState.noteStats[name] = { correct: 0, incorrect: 0 };
+            });
+
             createPianoKeys();
+            updateStatsDisplay();
             setupEventListeners();
             playRandomNote();
         }
@@ -312,10 +393,47 @@
                 const noteInfo = notes[name];
                 const button = document.createElement('button');
                 button.className = `key-button ${noteInfo.class}`;
-                button.innerHTML = `<span>${name}</span><span class="key-name"></span>`;
+                button.innerHTML = `<span>${name}</span><span class="key-name"></span><span class="key-stats" id="stats-${name}"></span>`;
                 button.dataset.note = name;
                 button.addEventListener('click', () => guessNote(name));
                 container.appendChild(button);
+            });
+
+            updateKeyStats();
+        }
+
+        // キーボタンの統計を更新
+        function updateKeyStats() {
+            noteNames.forEach(name => {
+                const stats = gameState.noteStats[name];
+                const statEl = document.getElementById(`stats-${name}`);
+                if (stats.correct + stats.incorrect > 0) {
+                    statEl.textContent = `✓${stats.correct} ✗${stats.incorrect}`;
+                } else {
+                    statEl.textContent = '';
+                }
+            });
+        }
+
+        // 成績表示を更新
+        function updateStatsDisplay() {
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = '';
+
+            noteNames.forEach(name => {
+                const stats = gameState.noteStats[name];
+                const total = stats.correct + stats.incorrect;
+                const rate = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+
+                const item = document.createElement('div');
+                item.className = 'stat-item';
+                item.innerHTML = `
+                    <div class="stat-note">${name}</div>
+                    <div class="stat-correct">✓ ${stats.correct}</div>
+                    <div class="stat-incorrect">✗ ${stats.incorrect}</div>
+                    <div class="stat-rate">${rate}%</div>
+                `;
+                grid.appendChild(item);
             });
         }
 
@@ -337,32 +455,52 @@
             const randomNote = noteNames[Math.floor(Math.random() * noteNames.length)];
             gameState.currentNote = randomNote;
 
-            playSound(notes[randomNote].freq, 1.0);
+            playPianoSound(notes[randomNote].freq, 1.5);
         }
 
-        // 音を再生
-        function playSound(frequency, duration = 1.0) {
+        // ピアノ音を再生
+        function playPianoSound(frequency, duration = 1.5) {
             try {
                 const now = audioContext.currentTime;
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
 
-                oscillator.connect(gainNode);
+                // ピアノらしい音を作るために複数の周波数成分を組み合わせる
+                const gainNode = audioContext.createGain();
                 gainNode.connect(audioContext.destination);
 
-                oscillator.frequency.value = frequency;
-                oscillator.type = 'sine';
+                // 基本波 + 倍音でピアノらしい音を作る
+                const harmonics = [
+                    { ratio: 1, volume: 0.4 },
+                    { ratio: 2, volume: 0.2 },
+                    { ratio: 3, volume: 0.1 },
+                    { ratio: 4, volume: 0.08 }
+                ];
 
-                // フェードイン
-                gainNode.gain.setValueAtTime(0, now);
-                gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                harmonics.forEach(harmonic => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
 
-                // フェードアウト
-                gainNode.gain.setValueAtTime(0.3, now + duration - 0.2);
-                gainNode.gain.linearRampToValueAtTime(0, now + duration);
+                    osc.connect(gain);
+                    gain.connect(gainNode);
 
-                oscillator.start(now);
-                oscillator.stop(now + duration);
+                    osc.frequency.value = frequency * harmonic.ratio;
+                    osc.type = 'sine';
+
+                    // ピアノのようなエンベロープ（減衰）
+                    gain.gain.setValueAtTime(0, now);
+                    // アタック（立ち上がり）
+                    gain.gain.linearRampToValueAtTime(harmonic.volume, now + 0.05);
+                    // ディケイ（減衰）
+                    gain.gain.exponentialRampToValueAtTime(0.1, now + duration * 0.3);
+                    // リリース（リリース）
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+
+                    osc.start(now);
+                    osc.stop(now + duration);
+                });
+
+                // マスターゲインの設定
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
 
                 // 再生完了後の処理
                 setTimeout(() => {
@@ -394,6 +532,8 @@
             if (guessedNote === gameState.currentNote) {
                 // 正解
                 gameState.correctCount++;
+                gameState.noteStats[gameState.currentNote].correct++;
+
                 buttons.forEach(btn => {
                     if (btn.dataset.note === gameState.currentNote) {
                         btn.classList.add('correct');
@@ -401,10 +541,12 @@
                 });
                 feedback.textContent = '✨ せいかい！';
                 feedback.className = 'feedback correct-feedback';
-                playSound(notes[guessedNote].freq, 0.5);
+                playPianoSound(notes[guessedNote].freq, 0.8);
             } else {
                 // 不正解
                 gameState.incorrectCount++;
+                gameState.noteStats[gameState.currentNote].incorrect++;
+
                 buttons.forEach(btn => {
                     if (btn.dataset.note === gameState.currentNote) {
                         btn.classList.add('correct');
@@ -417,6 +559,8 @@
             }
 
             updateScore();
+            updateKeyStats();
+            updateStatsDisplay();
 
             // 2秒後に次の問題へ
             setTimeout(() => {
@@ -432,6 +576,12 @@
         function updateScore() {
             document.getElementById('correctCount').textContent = gameState.correctCount;
             document.getElementById('incorrectCount').textContent = gameState.incorrectCount;
+
+            const total = gameState.correctCount + gameState.incorrectCount;
+            if (total > 0) {
+                const accuracy = Math.round((gameState.correctCount / total) * 100);
+                document.getElementById('accuracy').textContent = accuracy + '%';
+            }
         }
 
         // ゲーム開始
