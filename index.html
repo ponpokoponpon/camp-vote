@@ -233,6 +233,7 @@
         }
         function goToNext() {
             document.getElementById('nextButton').classList.remove('visible');
+            document.getElementById('submitButton').disabled = false;
             document.querySelectorAll('.key-button').forEach(btn => { btn.disabled = false; btn.classList.remove('correct', 'incorrect', 'selected'); });
             gameState.currentNote = null;
             gameState.currentChord = null;
@@ -352,6 +353,7 @@
             }
         }
         function checkAnswer() {
+            document.getElementById('submitButton').disabled = true;
             const guessedNote = gameState.selectedNotes[0];
             const isCorrect = guessedNote === gameState.currentNote;
             const feedback = document.getElementById('feedback');
@@ -381,6 +383,7 @@
             showNextButton();
         }
         function checkChordAnswer() {
+            document.getElementById('submitButton').disabled = true;
             const selectedSet = new Set(gameState.selectedNotes.sort());
             const correctSet = new Set(gameState.currentChord.sort());
             const isCorrect = selectedSet.size === correctSet.size && [...selectedSet].every(note => correctSet.has(note));
